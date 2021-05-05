@@ -14,24 +14,24 @@ class Graph {
     String baseUrl,
   }) {
     _clientFuseEntities = GraphQLClient(
-      link: HttpLink(uri: '$baseUrl/fuse-entities'),
-      cache: InMemoryCache(),
+      link: HttpLink('$baseUrl/fuse-entities'),
+      cache: GraphQLCache(),
     );
 
     _clientFuseRopstenBridge = GraphQLClient(
-      link: HttpLink(uri: '$baseUrl/fuse-ropsten-bridge'),
-      cache: InMemoryCache(),
+      link: HttpLink('$baseUrl/fuse-ropsten-bridge'),
+      cache: GraphQLCache(),
     );
 
     _clientFuseMainnetBridge = GraphQLClient(
-      link: HttpLink(uri: '$baseUrl/fuse-ethereum-bridge'),
-      cache: InMemoryCache(),
+      link: HttpLink('$baseUrl/fuse-ethereum-bridge'),
+      cache: GraphQLCache(),
     );
   }
 
   Future<dynamic> getCommunityByAddress(String communityAddress) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      documentNode: gql(getCommunityByAddressQuery),
+      document: gql(getCommunityByAddressQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
@@ -45,7 +45,7 @@ class Graph {
 
   Future<dynamic> getCommunityBusinesses(String communityAddress) async {
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      documentNode: gql(getCommunityBusinessesQuery),
+      document: gql(getCommunityBusinessesQuery),
       variables: <String, dynamic>{
         'address': communityAddress,
       },
@@ -62,13 +62,13 @@ class Graph {
     GraphQLClient client =
         isRopsten ? _clientFuseRopstenBridge : _clientFuseMainnetBridge;
     QueryResult result = await client.query(QueryOptions(
-      documentNode: gql(getHomeBridgedTokenQuery),
+      document: gql(getHomeBridgedTokenQuery),
       variables: <String, dynamic>{
         'foreignAddress': foreignTokenAddress,
       },
     ));
     if (result.hasException) {
-      throw 'Error! Get home bridge token request failed - foreignTokenAddress: $foreignTokenAddress ${result.exception.clientException.message}';
+      throw 'Error! Get home bridge token request failed - foreignTokenAddress: $foreignTokenAddress ${result.exception.linkException.originalException}';
     } else {
       return result.data["bridgedTokens"][0];
     }
@@ -76,9 +76,9 @@ class Graph {
 
   Future<bool> isCommunityMember(
       String accountAddress, String entitiesListAddress) async {
-    _clientFuseEntities.cache.reset();
+    _clientFuseEntities.cache.store.reset();
     QueryResult result = await _clientFuseEntities.query(QueryOptions(
-      documentNode: gql(isCommunityMemberQuery),
+      document: gql(isCommunityMemberQuery),
       variables: <String, dynamic>{
         'address': accountAddress,
         'entitiesList': entitiesListAddress

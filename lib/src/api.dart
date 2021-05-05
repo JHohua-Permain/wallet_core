@@ -37,10 +37,10 @@ class API extends Api {
     Response response;
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.get('$uri/$endpoint',
+      response = await _client.get(Uri.parse('$uri/$endpoint'),
           headers: {"Authorization": "Bearer $_jwtToken"});
     } else {
-      response = await _client.get('$uri/$endpoint');
+      response = await _client.get(Uri.parse('$uri/$endpoint'));
     }
     return responseHandler(response);
   }
@@ -56,14 +56,14 @@ class API extends Api {
     body = body == null ? body : json.encode(body);
     String uri = isRopsten ? toRopsten(_base) : _base;
     if (private != null && private) {
-      response = await _client.post('$uri/$endpoint',
+      response = await _client.post(Uri.parse('$uri/$endpoint'),
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
           },
           body: body);
     } else {
-      response = await _client.post('$uri/$endpoint',
+      response = await _client.post(Uri.parse('$uri/$endpoint'),
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return responseHandler(response);
@@ -78,14 +78,14 @@ class API extends Api {
     Response response;
     body = body == null ? body : json.encode(body);
     if (private != null && private) {
-      response = await _client.put('$_base/$endpoint',
+      response = await _client.put(Uri.parse('$_base/$endpoint'),
           headers: {
             "Authorization": "Bearer $_jwtToken",
             "Content-Type": 'application/json'
           },
           body: body);
     } else {
-      response = await _client.put('$_base/$endpoint',
+      response = await _client.put(Uri.parse('$_base/$endpoint'),
           body: body, headers: {"Content-Type": 'application/json'});
     }
     return responseHandler(response);
